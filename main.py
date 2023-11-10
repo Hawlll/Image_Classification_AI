@@ -29,19 +29,44 @@ for image_class in os.listdir(data_dir):
         except Exception as e: #Happens if something wrong with loading
             print(f"Issue with image {image_path}")
 
-#Builds images dataset (Resize images, shuffle them, label, classifies). This is a generator and does not store in memory or DATA PIPELINE.
+#Builds images dataset (Resize images, shuffle them, label, classifies). This is a generator and does not store in memory (DATA PIPELINE).
 data = tf.keras.utils.image_dataset_from_directory(data_dir)
 
-data_iterator = tf.data.NumpyIterator(data)
+#Scales down images for optimization
+scaled_data = data.map(lambda x,y: (x/255, y))
 
-#Each batch has an image in array and label(1 or 0 (happy or sad))
-batch = data_iterator.next()
+#train data to train model, validation data to evalutate model, test data to test (post training)
+#size represent number of batches
+train_size = int(len(data) *0.7)
+val_size = int(len(data)*0.2)+1
+test_size = int(len(data) * 0.1)+1
 
-#Classification: 0 HAPPY, 1 SAD
-batch[1]
+#Grab Batches. Skip means skips spots. Take is take
+train = data.take(train_size)
+val = data.skip(train_size).take(val_size)
+test = data.skip(train_size+val_size).take(test_size)
 
+scaled_data_iterator = tf.data.NumpyIterator(scaled_data)
+
+#Each batch has 32 data. image in array and label(1 or 0 (happy or sad))
+batch = scaled_data_iterator.next()
+
+HAPPY = 0
+SAD = 1
+
+
+# Display data analysis
 figure, ax = plt.subplots(ncols=4)
+
 for index, img, in enumerate(batch[0][:4]):
-    ax[index].imshow(img.astype(int))
-    ax[index].title.set_text(batch[1][index])
+    ax[index].imshow(img)
+    if batch[1][index] == HAPPY:
+        ax[index].title.set_text("Happy")
+    elif batch[1][index] == SAD:
+        ax[index].title.set_text("Sad")
+    else:
+        ax[index].title.set_text("Couldn't Decide")
+    
 plt.show()
+    
+data = data.map(lambda x,y: (x/255, y))
