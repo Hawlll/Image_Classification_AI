@@ -2,7 +2,7 @@ import tensorflow as tf #Access gpu power
 import os #Acces file strucutres
 import cv2 #Computer Vision
 import imghdr #Check file extensions for data
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt  # To plot data and ai performance
 import numpy as np
 #Make sure interpreter is python 3.9 for tensor-gpu compabability
 
@@ -68,5 +68,39 @@ for index, img, in enumerate(batch[0][:4]):
         ax[index].title.set_text("Couldn't Decide")
     
 plt.show()
-    
-data = data.map(lambda x,y: (x/255, y))
+
+#Sequential is an api geared toward linear model (one input)
+model = tf.keras.Sequential()
+layer = tf.keras.layers
+
+#Layers
+
+# Conv2d slides over input and learns certain features like edges, patterns
+
+#MaxPool2d grabs most important info by partioning image and returns max values 
+
+#Dense takes nodes in a fully connected layer and learns patterns based on the node's weight or influence
+
+#Flatten makes layer ready for others by transforming data into pixel values
+
+#Dropout temporarliy turns of nodes for better generilzations 
+
+#Add layers in model
+model.add(layer.Conv2D(16, (3,3), 1, activation="relu", input_shape=(256,256,3)))
+model.add(layer.MaxPool2D())
+
+model.add(layer.Conv2D(32, (3,3), 1, activation="relu"))
+model.add(layer.MaxPool2D())
+
+model.add(layer.Conv2D(16, (3,3), 1, activation="relu"))
+model.add(layer.MaxPool2D())
+
+model.add(layer.Flatten())
+
+model.add(layer.Dense(256, activation="relu"))
+model.add(layer.Dense(1, activation="sigmoid"))
+
+#Assemble layers
+model.compile('adam', loss=tf.losses.BinaryCrossentropy(), metrics=['accuracy'])
+model.summary()
+
