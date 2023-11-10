@@ -104,3 +104,21 @@ model.add(layer.Dense(1, activation="sigmoid"))
 model.compile('adam', loss=tf.losses.BinaryCrossentropy(), metrics=['accuracy'])
 model.summary()
 
+#Track model Performance in logs file
+logdir = 'logs'
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
+
+#Train model by declaring how long what data for training and validation and then log performance
+#Desirable results: Lower loss(deviation) and higher accuracy
+hist = model.fit(train, epochs=20, validation_data=val, callbacks=[tensorboard_callback])
+print(hist)
+
+#Plot Performance
+
+fig = plt.figure()
+plt.plot(hist.history['loss'], color='teal', label='loss')
+plt.plot(hist.history['val_loss'], color='orange', label='val_loss')
+plt.plot(hist.history['accuracy'], color='red', label='accuracy')
+fig.suptitle('Loss', fontsize=20)
+plt.legend(loc="upper left")
+plt.show()
