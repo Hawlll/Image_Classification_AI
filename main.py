@@ -122,3 +122,44 @@ plt.plot(hist.history['accuracy'], color='red', label='accuracy')
 fig.suptitle('Loss', fontsize=20)
 plt.legend(loc="upper left")
 plt.show()
+
+metrics = tf.keras.metrics
+
+precision = metrics.Precision()
+recall = metrics.Recall()
+accuracy = metrics.BinaryAccuracy()
+test_iterator = tf.data.NumpyIterator(test)
+
+for batch in test_iterator:
+    X, Y = batch
+    yhat = model.predict(X)
+    precision.update_state(Y, yhat)
+    recall.update_state(Y, yhat)
+    accuracy.update_state(Y, yhat)
+
+print(f"Precision: {precision.result()}, Recall: {recall.result()}, Accuracy: {accuracy.result()}")
+
+#Test model with random images
+test_img = ['adam_test.jpg', 'kevin_test.jpg']
+for elem in test_img:
+    print("-"*20)
+    img = cv2.imread(elem)
+    resize = tf.image.resize(img, (256,256))
+    plt.imshow(cv2.cvtColor(resize.numpy(), cv2.COLOR_RGB2BGR))
+    plt.show()
+
+    yhat = model.predict(np.expand_dims(resize/255, 0))
+    print(yhat)
+    if yhat > 0.5:
+        print(f"Predicted class for {elem} is Sad")
+    else:
+        print(f"Predicted class for {elem} is Happy")
+
+
+
+#Save model 
+models = tf.keras.models
+model.save(os.path.join('models','happysadmodel.h5'))
+
+#Grab certain model
+# new_model = models.load_model(os.path.join('models','happysadmodel.h5'))
