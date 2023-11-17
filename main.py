@@ -46,6 +46,7 @@ train = data.take(train_size)
 val = data.skip(train_size).take(val_size)
 test = data.skip(train_size+val_size).take(test_size)
 
+
 scaled_data_iterator = tf.data.NumpyIterator(scaled_data)
 
 #Each batch has 32 data. image in array and label(1 or 0 (happy or sad))
@@ -104,33 +105,34 @@ model.add(layer.Dense(1, activation="sigmoid"))
 model.compile('adam', loss=tf.losses.BinaryCrossentropy(), metrics=['accuracy'])
 model.summary()
 
-#Track model Performance in logs file
-logdir = 'logs'
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
+# Track model Performance in logs file
+# logdir = 'logs'
+# tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
 
 #Train model by declaring how long what data for training and validation and then log performance
 #Desirable results: Lower loss(deviation) and higher accuracy
-hist = model.fit(train, epochs=20, validation_data=val, callbacks=[tensorboard_callback])
+#callbacks=[tensorboard_callback]
+hist = model.fit(train, epochs=20, validation_data=val)
 print(hist)
 
 #Plot Performance
 
-fig = plt.figure()
-plt.plot(hist.history['loss'], color='teal', label='loss')
-plt.plot(hist.history['val_loss'], color='orange', label='val_loss')
-plt.plot(hist.history['accuracy'], color='red', label='accuracy')
-fig.suptitle('Loss', fontsize=20)
-plt.legend(loc="upper left")
-plt.show()
+# fig = plt.figure()
+# plt.plot(hist.history['loss'], color='teal', label='loss')
+# plt.plot(hist.history['val_loss'], color='orange', label='val_loss')
+# plt.plot(hist.history['accuracy'], color='red', label='accuracy')
+# fig.suptitle('Loss', fontsize=20)
+# plt.legend(loc="upper left")
+# plt.show()
 
 metrics = tf.keras.metrics
 
 precision = metrics.Precision()
 recall = metrics.Recall()
 accuracy = metrics.BinaryAccuracy()
-test_iterator = tf.data.NumpyIterator(test)
+test_data_iterator = tf.data.NumpyIterator(test)
 
-for batch in test_iterator:
+for batch in test_data_iterator:
     X, Y = batch
     yhat = model.predict(X)
     precision.update_state(Y, yhat)
@@ -145,7 +147,7 @@ for elem in test_img:
     print("-"*20)
     img = cv2.imread(elem)
     resize = tf.image.resize(img, (256,256))
-    plt.imshow(cv2.cvtColor(resize.numpy(), cv2.COLOR_RGB2BGR))
+    plt.imshow(resize)
     plt.show()
 
     yhat = model.predict(np.expand_dims(resize/255, 0))
