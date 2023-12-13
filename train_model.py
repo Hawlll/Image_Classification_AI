@@ -143,7 +143,7 @@ for batch in test_data_iterator:
 print(f"Precision: {precision.result()}, Recall: {recall.result()}, Accuracy: {accuracy.result()}")
 
 #Test model with random images
-test_img = ['adam_test.jpg', 'kevin_test.jpg']
+test_img = ['adam_test.jpg', 'kevin_test.jpg'] #Choose personal images
 for elem in test_img:
     print("-"*20)
     img = cv2.imread(elem)
@@ -162,7 +162,7 @@ for elem in test_img:
 
 #Save model 
 models = tf.keras.models
-model.save(os.path.join('models','happysadmodel.h5'))
+model.save(os.path.join('models','happysadmodel.h5')) #Choose personal file location
 
 #Grab certain model
 # new_model = models.load_model(os.path.join('models','happysadmodel.h5'))
